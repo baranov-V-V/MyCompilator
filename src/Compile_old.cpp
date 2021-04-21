@@ -535,13 +535,13 @@ void CompileSimpExpression(CompileInfo* compile, Node* node) {
                 break;
 
             case OP_MUL:
-                OFS += sprintf(BUF, "xor rdx, rdx \n");
-                OFS += sprintf(BUF, "mul rbx      \n");
+                OFS += sprintf(BUF, "cqo           \n");
+                OFS += sprintf(BUF, "imul rbx      \n");
                 break;
 
             case OP_DIV:
-                OFS += sprintf(BUF, "xor rdx, rdx \n");
-                OFS += sprintf(BUF, "div rbx      \n");
+                OFS += sprintf(BUF, "cqo           \n");
+                OFS += sprintf(BUF, "idiv rbx      \n");
                 break;
 
             default:

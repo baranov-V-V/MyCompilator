@@ -44,8 +44,6 @@ push 1
 jmp end_comp_0   
 end_comp_0:      
 
-;end compiling <compare> with label [0]
-
 ;begin assembling <if> with label [1]
 pop rax      
 cmp rax, 1   
@@ -100,8 +98,6 @@ push 1
 jmp end_comp_2   
 end_comp_2:      
 
-;end compiling <compare> with label [2]
-
 ;begin assembling <if> with label [3]
 pop rax      
 cmp rax, 1   
@@ -124,8 +120,6 @@ true_4:
 push 1            
 jmp end_comp_4   
 end_comp_4:      
-
-;end compiling <compare> with label [4]
 
 ;begin assembling <if> with label [5]
 pop rax      
@@ -156,17 +150,17 @@ push 0
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
 mov rax, [rbp - 8 * 1] ; var [k]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [if]
 pop rax  
-xor rdx, rdx 
-div rbx      
+cqo           
+idiv rbx      
 push rax  ;end assembling math op
 pop rdi        
 call PrintSign 
@@ -193,30 +187,30 @@ push rax
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 push 4
 mov rax, [rbp - 8 * 1] ; var [a]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 mov rax, [rbp - 8 * 3] ; var [c]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
@@ -244,8 +238,6 @@ push 1
 jmp end_comp_6   
 end_comp_6:      
 
-;end compiling <compare> with label [6]
-
 ;begin assembling <if> with label [7]
 pop rax      
 cmp rax, 1   
@@ -266,14 +258,14 @@ push 0
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
 mov rax, [rbp - 8 * 7] ; var [root]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
@@ -281,16 +273,16 @@ push 2
 mov rax, [rbp - 8 * 1] ; var [a]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [if]
 pop rax  
-xor rdx, rdx 
-div rbx      
+cqo           
+idiv rbx      
 push rax  ;end assembling math op
 pop rax   
 mov [rbp - 8 * 5], rax ;assembling assignment var [x1]
@@ -298,14 +290,14 @@ push 0
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
 mov rax, [rbp - 8 * 7] ; var [root]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [double]
 pop rax  
 add rax, rbx
 push rax  ;end assembling math op
@@ -313,16 +305,16 @@ push 2
 mov rax, [rbp - 8 * 1] ; var [a]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [if]
 pop rax  
-xor rdx, rdx 
-div rbx      
+cqo           
+idiv rbx      
 push rax  ;end assembling math op
 pop rax   
 mov [rbp - 8 * 6], rax ;assembling assignment var [x2]
@@ -356,8 +348,6 @@ push 1
 jmp end_comp_8   
 end_comp_8:      
 
-;end compiling <compare> with label [8]
-
 ;begin assembling <if> with label [9]
 pop rax      
 cmp rax, 1   
@@ -369,7 +359,7 @@ push 0
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
@@ -377,16 +367,16 @@ push 2
 mov rax, [rbp - 8 * 1] ; var [a]
 push rax  
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [if]
 pop rax  
-xor rdx, rdx 
-div rbx      
+cqo           
+idiv rbx      
 push rax  ;end assembling math op
 pop rax   
 mov [rbp - 8 * 5], rax ;assembling assignment var [x1]
@@ -412,8 +402,11 @@ end_cond_7:
 add rsp, 8 * 7 
 pop rbp         
 ret 8 * 3  ; returning from function [Solvesquare]
+																		 
+;This is standart input output funcs
+																		 
 PrintSign:													 
-				 xor r14, r14							   
+        xor r14, r14							   
 																	   
         mov rax, mask        		   
 																	   
@@ -472,9 +465,9 @@ PrintBuff:
         or r14, r14					       
         jz end_print_buff		       
 																		 
-				 mov al, 0xA								 
-				 mov byte [Buffer + r14], al 
-				 inc r14				  		       
+        mov al, 0xA								 
+        mov byte [Buffer + r14], al 
+        inc r14				  		       
 																	   
         mov rax, 1						       
         mov rsi, Buffer             
@@ -491,58 +484,58 @@ end_print_buff:
 GetNumber:													 
         xor r10, r10								 
         mov rax, 0						  		 
-	       mov rdi, 1									 
-	       mov rsi, Buffer						 
-	       mov rdx, buf_size					 
-	       syscall	           				 
-	       													   
-	       xor r14, r14 							 
-	       xor rax, rax								 
+        mov rdi, 1									 
+        mov rsi, Buffer						 
+        mov rdx, buf_size					 
+        syscall	           				 
+        													   
+        xor r14, r14 							 
+        xor rax, rax								 
         														 
-	       mov byte al, [Buffer + r14] 
-	       cmp al, '-'								 
-	       jne no_neg									 
-	       inc r14								     
-	       mov r10, 1							     
-																		 
+        mov byte al, [Buffer + r14] 
+        cmp al, '-'								 
+        jne no_neg									 
+        inc r14								     
+        mov r10, 1							     
+         													 
     no_neg:												 
-				 xor rdi, rdi								 
+        xor rdi, rdi								 
         														 
         mov byte al, [Buffer + r14] 
         inc r14										 
 																		 
     loop_number_get:								 
 																     
-	       sub al, '0'							   
-	       														 
-	       add rdi, rax								 
-	       														 
-	       mov byte al, [Buffer + r14] 
-	       inc r14										 
-              											 
-	       cmp al, 0xA								 
-	       je end_get_number					 
-	       														 
-	       mov bl, al								   
+        sub al, '0'							   
         														 
-	       mov rax, rdi								 
-	       mov rdi, 10								 
-	       														 
-	       mul rdi										 
-	       mov rdi, rax								 
+        add rdi, rax								 
+        														 
+        mov byte al, [Buffer + r14] 
+        inc r14										 
               											 
-	       xor rax, rax								 
-	       mov al, bl									 
-	       jmp loop_number_get				 
+        cmp al, 0xA								 
+        je end_get_number					 
+        														 
+        mov bl, al								   
+        														 
+        mov rax, rdi								 
+        mov rdi, 10								 
+        														 
+        mul rdi										 
+        mov rdi, rax								 
+              											 
+        xor rax, rax								 
+        mov al, bl									 
+        jmp loop_number_get				 
 																		 
     end_get_number:								 
 																		 
-	       mov rax, rdi								 
+        mov rax, rdi								 
               											 
-	       cmp r10, 1									 
-	       jne end_function						 
+        cmp r10, 1									 
+        jne end_function						 
         														 
-	       neg rax										 
+        neg rax										 
 																		 
     end_function:			 						 
  																	 

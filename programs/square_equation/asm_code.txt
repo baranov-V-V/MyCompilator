@@ -1,0 +1,162 @@
+section .text
+
+global _start
+
+_start:        
+call main      
+mov rax, 0x3C  
+xor rdi, rdi   
+syscall        
+        
+
+
+main:         
+push rbp    
+mov rbp, rsp
+push 0
+pop rax
+mov [rbp + 8 * 1 + 8], rax ;compiling declaration var [a]
+push 0
+pop rax
+mov [rbp + 8 * 2 + 8], rax ;compiling declaration var [b]
+push 0
+pop rax
+mov [rbp + 8 * 3 + 8], rax ;compiling declaration var [c]
+in                      
+pop [rbp + 8 * 1 + 8]  
+in                      
+pop [rbp + 8 * 2 + 8]  
+in                      
+pop [rbp + 8 * 3 + 8]  
+push [rbp + 8 * 1 + 8]
+push 0
+pop rax  
+pop rbx  
+push rax  
+pop rax      
+cmp rax, 1   
+je  true_0  
+jmp false_0 
+true_0:     
+push [rbp + 8 * 3 + 8]
+push [rbp + 8 * 2 + 8]
+push [rbp + 8 * 1 + 8]
+call Solvesquare
+jmp end_cond_0  
+false_0:        
+push [rbp + 8 * 3 + 8]
+push [rbp + 8 * 2 + 8]
+call Solvelinear
+end_cond_0:     
+pop rbp     
+ret 8 * 0  ; returning from function [main]
+        
+
+
+Solvelinear:         
+push rbp    
+mov rbp, rsp
+push [rbp + 8 * 1 + 8]
+push 0
+pop rax  
+pop rbx  
+push rax  
+pop rax      
+cmp rax, 1   
+je  true_1  
+jmp false_1 
+true_1:     
+push [rbp + 8 * 2 + 8]
+push 0
+pop rax  
+pop rbx  
+push rax  
+pop rax      
+cmp rax, 1   
+je  true_2  
+jmp false_2 
+true_2:     
+push 100500
+out
+jmp end_cond_2  
+false_2:        
+push 0
+out
+end_cond_2:     
+jmp end_cond_1  
+false_1:        
+push 1
+out
+push 0
+out
+end_cond_1:     
+pop rbp     
+ret 8 * 2  ; returning from function [Solvelinear]
+        
+
+
+Solvesquare:         
+push rbp    
+mov rbp, rsp
+push [rbp + 8 * 2 + 8]
+pop rax
+mov [rbp + 8 * 4 + 8], rax ;compiling declaration var [desc]
+push 0
+pop rax
+mov [rbp + 8 * 5 + 8], rax ;compiling declaration var [x1]
+push 0
+pop rax
+mov [rbp + 8 * 6 + 8], rax ;compiling declaration var [x2]
+push [rbp + 8 * 4 + 8]
+push 0
+pop rax  
+pop rbx  
+push rax  
+pop rax      
+cmp rax, 1   
+je  true_3  
+jmp false_3 
+true_3:     
+push [rbp + 8 * 4 + 8]
+sqrt
+pop rax
+mov [rbp + 8 * 7 + 8], rax ;compiling declaration var [root]
+push 0
+pop rax
+mov [rbp + 8 * 5 + 8], rax ;compiling assignment var[x1]
+push 0
+pop rax
+mov [rbp + 8 * 6 + 8], rax ;compiling assignment var[x2]
+push 2
+out
+push [rbp + 8 * 5 + 8]
+out
+push [rbp + 8 * 6 + 8]
+out
+jmp end_cond_3  
+false_3:        
+push [rbp + 8 * 4 + 8]
+push 0
+pop rax  
+pop rbx  
+push rax  
+pop rax      
+cmp rax, 1   
+je  true_4  
+jmp false_4 
+true_4:     
+push 0
+pop rax
+mov [rbp + 8 * 5 + 8], rax ;compiling assignment var[x1]
+push 1
+out
+push [rbp + 8 * 5 + 8]
+out
+jmp end_cond_4  
+false_4:        
+push 0
+out
+end_cond_4:     
+end_cond_3:     
+pop rbp     
+ret 8 * 3  ; returning from function [Solvesquare]
