@@ -1,7 +1,12 @@
 #include "Language.h"
 #include "Compile.h"
 
-#define COMP_FP compile->fp
+#define BUF compile->buffer + compile->buf_ofs
+#define OFS compile->buf_ofs
+
+//#define PRINT_BUF_ARGS(format, arguments) compile->buf_ofs += sprintf(compile->buffer + compile->buf_ofs, format, arguments)
+//#define PRINT_BUF_NO_ARGS(format) compile->buf_ofs += sprintf(compile->buffer + compile->buf_ofs, format)
+
 #define FUNCTION compile->table->functions[compile->func_no]
 
 void MakeNamesTable(Tree* tree, NamesTable* table) {
@@ -177,6 +182,9 @@ void ConstructCompile(CompileInfo* compile, NamesTable* table) {
     compile->table = table;
     compile->func_no = 0;
     compile->labels_count = 0;
+    compile->buf_ofs = 0;
+    compile->buffer = (char*) calloc(buf_size, sizeof(char));
+    assert(compile->buffer);
 
     #ifdef DEFAULT_OUTPUT
     compile->fp = fopen(standart_output, "w");
@@ -187,7 +195,7 @@ void ConstructCompile(CompileInfo* compile, NamesTable* table) {
 
     compile->fp = fopen(file_name, "w");
     if (compile->fp == nullptr) {
-        fprintf(stderr, "File is not found\n");
+        fprintf(stderr, "Can not create file\n");
         return;
     }
     #endif
@@ -199,6 +207,9 @@ void DestructCompile(CompileInfo* compile) {
     NamesTableDestruct(compile->table);
     compile->func_no = -1;
     compile->labels_count = -1;
+
+    free(compile->buffer);
+
     fclose(compile->fp);
 }
 
@@ -216,6 +227,8 @@ void MakeCompilation(Tree* tree) {
 
     CompileFunctions(&compile, tree->root);
 
+    fprintf(compile.fp, "%s", compile.buffer);
+
     DestructCompile(&compile);
 
     fprintf(stderr, "Done compilation!\n");
@@ -225,13 +238,13 @@ void CompileFunctions(CompileInfo* compile, Node* node) {
     assert(compile);
     assert(node);
 
-    fprintf(COMP_FP, "section .text\n\n"
-                     "global _start\n\n"
-                     "_start:        \n"
-                     "call main      \n"
-                     "mov rax, 0x3C  \n"
-                     "xor rdi, rdi   \n"
-                     "syscall        \n");
+    OFS += sprintf(BUF, "section .text\n\n"
+                        "global _start\n\n"
+                        "_start:        \n"
+                        "call main      \n"
+                        "mov rax, 0x3C  \n"
+                        "xor rdi, rdi   \n"
+                        "syscall        \n");
 
     while (node != nullptr) {
         CompileFuction(compile, node->right);
@@ -248,11 +261,11 @@ void CompileFuction(CompileInfo* compile, Node* node) {
     assert(compile);
     assert(node);
 
-    fprintf(COMP_FP, "             \n\n"
-                     "%s:            \n"
-                     "push rbp       \n"
-                     "mov rbp, rsp   \n"
-                     "sub rsp, 8 * %d\n", node->data.id, FUNCTION.var_count + FUNCTION.arg_count);
+    OFS += sprintf(BUF, "             \n\n"
+                        "%s:            \n"
+                        "push rbp       \n"
+                        "mov rbp, rsp   \n"
+                        "sub rsp, 8 * %d\n", node->data.id, FUNCTION.var_count + FUNCTION.arg_count);
 
     if (node->right != nullptr) {
         CompileArguments(compile, node->right);
@@ -266,8 +279,8 @@ void CompileArguments(CompileInfo* compile, Node* node) {
     assert(node);
 
     for (int i = 0; i < FUNCTION.arg_count; ++i) {
-        fprintf(COMP_FP, "mov rax, [rbp + 8 * %d + 8]   \n", GetVarIndex(&(FUNCTION), node->data.id));
-        fprintf(COMP_FP, "mov [rbp - 8 * %d], rax; fetching arg [%s] into local stack frame\n", GetVarIndex(&(FUNCTION), node->data.id), node->data.id);
+        OFS += sprintf(BUF, "mov rax, [rbp + 8 * %d + 8]   \n", GetVarIndex(&(FUNCTION), node->data.id));
+        OFS += sprintf(BUF, "mov [rbp - 8 * %d], rax; fetching arg [%s] into local stack frame\n", GetVarIndex(&(FUNCTION), node->data.id), node->data.id);
         node = node->right;
     }
 }
@@ -325,8 +338,8 @@ void CompileDeclaration(CompileInfo* compile, Node* node) {
     assert(node);
 
     CompileExpression(compile, node->right);
-    fprintf(COMP_FP, "pop rax   \n");
-    fprintf(COMP_FP, "mov [rbp - 8 * %d], rax ; assembling declaration var [%s]\n", GetVarIndex(&(FUNCTION), node->left->data.id), node->left->data.id);
+    OFS += sprintf(BUF, "pop rax   \n");
+    OFS += sprintf(BUF, "mov [rbp - 8 * %d], rax ; assembling declaration var [%s]\n", GetVarIndex(&(FUNCTION), node->left->data.id), node->left->data.id);
 }
 
 void CompileAssignment(CompileInfo* compile, Node* node) {
@@ -334,8 +347,8 @@ void CompileAssignment(CompileInfo* compile, Node* node) {
     assert(node);
 
     CompileExpression(compile, node->right);
-    fprintf(COMP_FP, "pop rax   \n");
-    fprintf(COMP_FP, "mov [rbp - 8 * %d], rax ;assembling assignment var [%s]\n", GetVarIndex(&(FUNCTION), node->left->data.id), node->left->data.id);
+    OFS += sprintf(BUF, "pop rax   \n");
+    OFS += sprintf(BUF, "mov [rbp - 8 * %d], rax ;assembling assignment var [%s]\n", GetVarIndex(&(FUNCTION), node->left->data.id), node->left->data.id);
 }
 
 void CompileReturn(CompileInfo* compile, Node* node) {
@@ -344,12 +357,12 @@ void CompileReturn(CompileInfo* compile, Node* node) {
 
     if (node->right != nullptr) {
         CompileExpression(compile, node->right);
-        fprintf(COMP_FP, "pop rax ; getting return value\n");
+        OFS += sprintf(BUF, "pop rax ; getting return value\n");
     }
 
-   fprintf(COMP_FP, "add rsp, 8 * %d \n"
-                    "pop rbp         \n"
-                    "ret 8 * %d  ; returning from function [%s]\n", FUNCTION.var_count + FUNCTION.arg_count, FUNCTION.arg_count, FUNCTION.func_name);
+   OFS += sprintf(BUF, "add rsp, 8 * %d \n"
+                        "pop rbp         \n"
+                        "ret 8 * %d  ; returning from function [%s]\n", FUNCTION.var_count + FUNCTION.arg_count, FUNCTION.arg_count, FUNCTION.func_name);
 
 }
 
@@ -360,23 +373,23 @@ void CompileCondition(CompileInfo* compile, Node* node) {
     CompileExpression(compile, node->left);
     int current_label = compile->labels_count++;
 
-    fprintf(COMP_FP, "\n;begin assembling <if> with label [%d]\n", current_label);
-    fprintf(COMP_FP, "pop rax      \n");
-    fprintf(COMP_FP, "cmp rax, 1   \n"
-                     "je  true_%d  \n"
-                     "jmp false_%d \n\n"
-                     "true_%d:     \n", current_label, current_label, current_label);
+    OFS += sprintf(BUF, "\n;begin assembling <if> with label [%d]\n", current_label);
+    OFS += sprintf(BUF, "pop rax      \n");
+    OFS += sprintf(BUF, "cmp rax, 1   \n"
+                        "je  true_%d  \n"
+                        "jmp false_%d \n\n"
+                        "true_%d:     \n", current_label, current_label, current_label);
     CompileCompound(compile, node->right->left);
 
-    fprintf(COMP_FP, "jmp end_cond_%d  \n\n"
-                     "false_%d:        \n", current_label, current_label);
+    OFS += sprintf(BUF, "jmp end_cond_%d  \n\n"
+                        "false_%d:        \n", current_label, current_label);
 
     if (node->right->right != nullptr) {
         CompileCompound(compile, node->right->right);
     }
 
-    fprintf(COMP_FP, "end_cond_%d:     \n", current_label);
-    fprintf(COMP_FP, "\n;end assembling <if> with label [%d]\n", current_label);
+    OFS += sprintf(BUF, "end_cond_%d:     \n", current_label);
+    OFS += sprintf(BUF, "\n;end assembling <if> with label [%d]\n", current_label);
 }
 
 void CompileLoop(CompileInfo* compile, Node* node) {
@@ -384,22 +397,22 @@ void CompileLoop(CompileInfo* compile, Node* node) {
     assert(node);
 
     int current_label = compile->labels_count++;
-    fprintf(COMP_FP, "\n;begin assembling loop with label [%d]\n", current_label);
-    fprintf(COMP_FP, "while_%d:  \n", current_label);
+    OFS += sprintf(BUF, "\n;begin assembling loop with label [%d]\n", current_label);
+    OFS += sprintf(BUF, "while_%d:  \n", current_label);
 
 
     CompileExpression(compile, node->left);
 
-    fprintf(COMP_FP, "pop rax         \n");
-    fprintf(COMP_FP, "cmp rax, 0      \n"
-                     "je end_while_%d \n\n", current_label);
+    OFS += sprintf(BUF, "pop rax         \n");
+    OFS += sprintf(BUF, "cmp rax, 0      \n"
+                        "je end_while_%d \n\n", current_label);
 
 
     CompileCompound(compile, node->right);
 
-    fprintf(COMP_FP, "jmp while_%d   \n"
-                     "end_while_%d:  \n", current_label, current_label);
-    fprintf(COMP_FP, "\n;end assembling <while> with label [%d]\n", current_label);
+    OFS += sprintf(BUF, "jmp while_%d   \n"
+                        "end_while_%d:  \n", current_label, current_label);
+    OFS += sprintf(BUF, "\n;end assembling <while> with label [%d]\n", current_label);
 };
 
 void CompileCall(CompileInfo* compile, Node* node) {
@@ -430,9 +443,9 @@ void CompileCall(CompileInfo* compile, Node* node) {
         tmp_node = tmp_node->parent;
     }
 
-    fprintf(COMP_FP, "call %s\n", compile->table->functions[func_id].func_name);
+    OFS += sprintf(BUF, "call %s\n", compile->table->functions[func_id].func_name);
     if (compile->table->functions[func_id].is_void != 0) {
-        fprintf(COMP_FP, "push rax ; return value of called function\n");
+        OFS += sprintf(BUF, "push rax ; return value of called function\n");
     }
 
 }
@@ -455,34 +468,34 @@ void MakeCompare(CompileInfo* compile, Node* node) {
     assert(compile);
     assert(node);
 
-    fprintf(COMP_FP, "\n;begin assembling <compare> with label [%d]\n", compile->labels_count);
-    fprintf(COMP_FP, "pop rbx      \n"
-                     "pop rax      \n"
-                     "cmp rax, rbx \n");
+    OFS += sprintf(BUF, "\n;begin assembling <compare> with label [%d]\n", compile->labels_count);
+    OFS += sprintf(BUF, "pop rbx      \n"
+                        "pop rax      \n"
+                        "cmp rax, rbx \n");
 
     switch (node->data.op) {
         case OP_EQUAL:
-            fprintf(COMP_FP, "je ");
+            OFS += sprintf(BUF, "je ");
             break;
 
         case OP_NOT_EQUAL:
-            fprintf(COMP_FP, "jne ");
+            OFS += sprintf(BUF, "jne ");
             break;
 
         case OP_GREATER:
-            fprintf(COMP_FP, "jg ");
+            OFS += sprintf(BUF, "jg ");
             break;
 
         case OP_LESS:
-            fprintf(COMP_FP, "jl ");
+            OFS += sprintf(BUF, "jl ");
             break;
 
         case OP_GREATER_EQUAL:
-            fprintf(COMP_FP, "jge ");
+            OFS += sprintf(BUF, "jge ");
             break;
 
         case OP_LESS_EQUAL:
-            fprintf(COMP_FP, "jle ");
+            OFS += sprintf(BUF, "jle ");
             break;
 
         default:
@@ -491,15 +504,13 @@ void MakeCompare(CompileInfo* compile, Node* node) {
     }
 
     int current_label = compile->labels_count++;
-    fprintf(COMP_FP, "true_%d           \n"
-                     "push 0            \n"
-                     "jmp end_comp_%d   \n"
-                     "true_%d:          \n"
-                     "push 1            \n"
-                     "jmp end_comp_%d   \n"
-                     "end_comp_%d:      \n", current_label, current_label, current_label, current_label, current_label);
-    fprintf(COMP_FP, "\n;end compiling <compare> with label [%d]\n", current_label);
-
+    OFS += sprintf(BUF, "true_%d           \n"
+                        "push 0            \n"
+                        "jmp end_comp_%d   \n"
+                        "true_%d:          \n"
+                        "push 1            \n"
+                        "jmp end_comp_%d   \n"
+                        "end_comp_%d:      \n", current_label, current_label, current_label, current_label, current_label);
 }
 
 void CompileSimpExpression(CompileInfo* compile, Node* node) {
@@ -510,33 +521,33 @@ void CompileSimpExpression(CompileInfo* compile, Node* node) {
             CompileSimpExpression(compile, node->left);
             CompileSimpExpression(compile, node->right);
 
-        fprintf(COMP_FP, "\n");
-        fprintf(COMP_FP, "pop rbx  ;begin assembling math op\n"
-                         "pop rax  \n");
+        OFS += sprintf(BUF, "\n");
+        OFS += sprintf(BUF, "pop rbx  ;begin assembling math op [%s]\n"
+                            "pop rax  \n", reference_op[node->data.op]);
 
         switch (node->data.op) {
             case OP_ADD:
-                fprintf(COMP_FP, "add rax, rbx\n");
+                OFS += sprintf(BUF, "add rax, rbx\n");
                 break;
 
             case OP_SUB:
-                fprintf(COMP_FP, "sub rax, rbx\n");
+                OFS += sprintf(BUF, "sub rax, rbx\n");
                 break;
 
             case OP_MUL:
-                fprintf(COMP_FP, "xor rdx, rdx \n");
-                fprintf(COMP_FP, "mul rbx      \n");
+                OFS += sprintf(BUF, "xor rdx, rdx \n");
+                OFS += sprintf(BUF, "mul rbx      \n");
                 break;
 
             case OP_DIV:
-                fprintf(COMP_FP, "xor rdx, rdx \n");
-                fprintf(COMP_FP, "div rbx      \n");
+                OFS += sprintf(BUF, "xor rdx, rdx \n");
+                OFS += sprintf(BUF, "div rbx      \n");
                 break;
 
             default:
                 printf("Unknown math type %d\n", node->data.op);
         }
-        fprintf(COMP_FP, "push rax  ;end assembling math op\n");
+        OFS += sprintf(BUF, "push rax  ;end assembling math op\n");
 
     }
     else {
@@ -550,12 +561,12 @@ void CompilePrimExpression(CompileInfo* compile, Node* node) {
 
     switch (node->type) {
         case TYPE_CONST:
-            fprintf(COMP_FP, "push %d\n", (int)node->data.num);
+            OFS += sprintf(BUF, "push %d\n", (int)node->data.num);
             break;
 
         case TYPE_VAR:
-            fprintf(COMP_FP, "mov rax, [rbp - 8 * %d] ; var [%s]\n", GetVarIndex(&(FUNCTION), node->data.id), node->data.id);
-            fprintf(COMP_FP, "push rax  \n"); // additional 8 because of ret in stack
+            OFS += sprintf(BUF, "mov rax, [rbp - 8 * %d] ; var [%s]\n", GetVarIndex(&(FUNCTION), node->data.id), node->data.id);
+            OFS += sprintf(BUF, "push rax  \n"); // additional 8 because of ret in stack
             break;
 
         case TYPE_CALL:
@@ -577,21 +588,21 @@ void CompileStandartFunc(CompileInfo* compile, Node* node, int standart_index) {
     switch (standart_index) {
 
         case IDX_SQRT:
-            fprintf(COMP_FP, "pop rax ; assembling sqrt    \n"
-                             "cvtsi2sd xmm0, rax           \n"
-                             "sqrtsd xmm0, xmm0            \n"
-                             "cvttsd2si rax, xmm0          \n"
-                             "push rax                     \n");
+            OFS += sprintf(BUF, "pop rax ; assembling sqrt    \n"
+                                "cvtsi2sd xmm0, rax           \n"
+                                "sqrtsd xmm0, xmm0            \n"
+                                "cvttsd2si rax, xmm0          \n"
+                                "push rax                     \n");
             break;
 
         case IDX_OUT:
-            fprintf(COMP_FP, "pop rdi        \n");
-            fprintf(COMP_FP, "call PrintSign \n");
+            OFS += sprintf(BUF, "pop rdi        \n");
+            OFS += sprintf(BUF, "call PrintSign \n");
             break;
 
         case IDX_IN:
-            fprintf(COMP_FP, "call GetNumber          \n");
-            fprintf(COMP_FP, "mov [rbp - 8 * %d], rax \n", GetVarIndex(&(FUNCTION), node->right->left->data.id));
+            OFS += sprintf(BUF, "call GetNumber          \n");
+            OFS += sprintf(BUF, "mov [rbp - 8 * %d], rax \n", GetVarIndex(&(FUNCTION), node->right->left->data.id));
             break;
 
         default:
@@ -629,7 +640,8 @@ int GetVarIndex(Function* func, char* id) {
 void AddStandartFuncs(CompileInfo* compile) {
     assert(compile);
 
-    fprintf(COMP_FP, "%s\n", out_function);
-    fprintf(COMP_FP, "%s\n", in_function);
-    fprintf(COMP_FP, "%s", section_data);
+    OFS += sprintf(BUF, "%s", standart_func_msg);
+    OFS += sprintf(BUF, "%s\n", out_function);
+    OFS += sprintf(BUF, "%s\n", in_function);
+    OFS += sprintf(BUF, "%s", section_data);
 }

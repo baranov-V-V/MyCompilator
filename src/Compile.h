@@ -3,6 +3,8 @@
 #define DEFAULT_OUTPUT
 const char* standart_output = "asm_code.asm";
 
+const int buf_size = 512000;
+
 typedef struct Function {
     char* func_name;
     char** var_names;
@@ -19,6 +21,8 @@ typedef struct NamesTable {
 typedef struct CompileInfo {
     NamesTable* table;
     FILE* fp;
+		char* buffer;
+		int buf_ofs;
     int labels_count;
     int func_no;
 } CompileInfo;
@@ -49,62 +53,67 @@ enum STANDART_INDEX {
     IDX_NUM
 };
 
+const char* standart_func_msg = 
+	"																		 \n"
+	";This is standart input\output funcs\n"
+	"																		 \n";
+
 const char* in_function = 
 	"GetNumber:													 \n"
 	"        xor r10, r10								 \n"
 	"        mov rax, 0						  		 \n"
-	"	       mov rdi, 1									 \n"
-	"	       mov rsi, Buffer						 \n"
-	"	       mov rdx, buf_size					 \n"
-	"	       syscall	           				 \n"
-	"	       													   \n"
-	"	       xor r14, r14 							 \n"
-	"	       xor rax, rax								 \n"
+	"        mov rdi, 1									 \n"
+	"        mov rsi, Buffer						 \n"
+	"        mov rdx, buf_size					 \n"
+	"        syscall	           				 \n"
+	"        													   \n"
+	"        xor r14, r14 							 \n"
+	"        xor rax, rax								 \n"
 	"        														 \n"
-	"	       mov byte al, [Buffer + r14] \n"
-	"	       cmp al, '-'								 \n"
-	"	       jne no_neg									 \n"
-	"	       inc r14								     \n"
-	"	       mov r10, 1							     \n"
-	"																		 \n"
+	"        mov byte al, [Buffer + r14] \n"
+	"        cmp al, '-'								 \n"
+	"        jne no_neg									 \n"
+	"        inc r14								     \n"
+	"        mov r10, 1							     \n"
+	"         													 \n"
 	"    no_neg:												 \n"
-	"				 xor rdi, rdi								 \n"
+	"        xor rdi, rdi								 \n"
 	"        														 \n"
 	"        mov byte al, [Buffer + r14] \n"
 	"        inc r14										 \n"
 	"																		 \n"
 	"    loop_number_get:								 \n"
 	"																     \n"
-	"	       sub al, '0'							   \n"
-	"	       														 \n"
-	"	       add rdi, rax								 \n"
-	"	       														 \n"
-	"	       mov byte al, [Buffer + r14] \n"
-	"	       inc r14										 \n"
-	"              											 \n"
-	"	       cmp al, 0xA								 \n"
-	"	       je end_get_number					 \n"
-	"	       														 \n"
-	"	       mov bl, al								   \n"
+	"        sub al, '0'							   \n"
 	"        														 \n"
-	"	       mov rax, rdi								 \n"
-	"	       mov rdi, 10								 \n"
-	"	       														 \n"
-	"	       mul rdi										 \n"
-	"	       mov rdi, rax								 \n"
+	"        add rdi, rax								 \n"
+	"        														 \n"
+	"        mov byte al, [Buffer + r14] \n"
+	"        inc r14										 \n"
 	"              											 \n"
-	"	       xor rax, rax								 \n"
-	"	       mov al, bl									 \n"
-	"	       jmp loop_number_get				 \n"
+	"        cmp al, 0xA								 \n"
+	"        je end_get_number					 \n"
+	"        														 \n"
+	"        mov bl, al								   \n"
+	"        														 \n"
+	"        mov rax, rdi								 \n"
+	"        mov rdi, 10								 \n"
+	"        														 \n"
+	"        mul rdi										 \n"
+	"        mov rdi, rax								 \n"
+	"              											 \n"
+	"        xor rax, rax								 \n"
+	"        mov al, bl									 \n"
+	"        jmp loop_number_get				 \n"
 	"																		 \n"
 	"    end_get_number:								 \n"
 	"																		 \n"
-	"	       mov rax, rdi								 \n"
+	"        mov rax, rdi								 \n"
 	"              											 \n"
-	"	       cmp r10, 1									 \n"
-	"	       jne end_function						 \n"
+	"        cmp r10, 1									 \n"
+	"        jne end_function						 \n"
 	"        														 \n"
-	"	       neg rax										 \n"
+	"        neg rax										 \n"
 	"																		 \n"
 	"    end_function:			 						 \n"
 	" 																	 \n"
@@ -114,7 +123,7 @@ const char* in_function =
 //PrintSign needs translation number in rdi
 const char* out_function =
 	"PrintSign:													 \n"
-	"				 xor r14, r14							   \n"
+	"        xor r14, r14							   \n"
 	"																	   \n"
   "        mov rax, mask        		   \n"
 	"																	   \n"
@@ -173,9 +182,9 @@ const char* out_function =
   "        or r14, r14					       \n"
   "        jz end_print_buff		       \n"
   "																		 \n"
-	"				 mov al, 0xA								 \n"
-	"				 mov byte [Buffer + r14], al \n"
-	"				 inc r14				  		       \n"
+	"        mov al, 0xA								 \n"
+	"        mov byte [Buffer + r14], al \n"
+	"        inc r14				  		       \n"
   "																	   \n"
 	"        mov rax, 1						       \n"
   "        mov rsi, Buffer             \n"
