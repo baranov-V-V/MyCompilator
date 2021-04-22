@@ -58,6 +58,7 @@ push rax
 mov rax, [rbp - 8 * 1] ; var [a]
 push rax  
 call Solvesquare
+add rsp, 8 * 3
 jmp end_cond_1  
 
 false_1:        
@@ -66,12 +67,13 @@ push rax
 mov rax, [rbp - 8 * 2] ; var [b]
 push rax  
 call Solvelinear
+add rsp, 8 * 2
 end_cond_1:     
 
 ;end assembling <if> with label [1]
 add rsp, 8 * 3 
 pop rbp         
-ret 8 * 0  ; returning from function [main]
+ret ; returning from function [main]
              
 
 Solvelinear:            
@@ -169,7 +171,7 @@ end_cond_3:
 ;end assembling <if> with label [3]
 add rsp, 8 * 2 
 pop rbp         
-ret 8 * 2  ; returning from function [Solvelinear]
+ret ; returning from function [Solvelinear]
              
 
 Solvesquare:            
@@ -401,7 +403,7 @@ end_cond_7:
 ;end assembling <if> with label [7]
 add rsp, 8 * 7 
 pop rbp         
-ret 8 * 3  ; returning from function [Solvesquare]
+ret ; returning from function [Solvesquare]
 																		 
 ;This is standart input output funcs
 																		 
@@ -422,12 +424,9 @@ PrintSign:
 																	   
     print_num:									     
         mov rsi, 10						     
-        call PrintNum					     
+                                    
+;begin of PrintNum 	  				     
 																     
-        ret										     
-;END PrintSign          			  	   
-																	   
-PrintNum:         								   
         mov rax, rdi;						   
 																	   
         xor rdi, rdi							   
@@ -457,11 +456,8 @@ loop_number_print:
         or rdi, rdi							   
         jne loop_number_print		   
 																	   
-        call PrintBuff						   
-        ret											   
-;END PrintDec										   
+;begin of PrintBuff								 
 																	   
-PrintBuff:												   
         or r14, r14					       
         jz end_print_buff		       
 																		 
@@ -479,7 +475,8 @@ PrintBuff:
                                     
 end_print_buff:							       
         ret									       
-;END PrintBuff								       
+                                    
+;END PrintSign								       
 
 GetNumber:													 
         xor r10, r10								 
@@ -540,6 +537,7 @@ GetNumber:
     end_function:			 						 
  																	 
         ret												 
+;END GetNumber                      
 
 section    .data								     
 Numbers:		db "0123456789ABCDEF"  

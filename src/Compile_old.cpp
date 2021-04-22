@@ -361,8 +361,8 @@ void CompileReturn(CompileInfo* compile, Node* node) {
     }
 
    OFS += sprintf(BUF, "add rsp, 8 * %d \n"
-                        "pop rbp         \n"
-                        "ret 8 * %d  ; returning from function [%s]\n", FUNCTION.var_count + FUNCTION.arg_count, FUNCTION.arg_count, FUNCTION.func_name);
+                       "pop rbp         \n"
+                       "ret ; returning from function [%s]\n", FUNCTION.var_count + FUNCTION.arg_count, FUNCTION.func_name);
 
 }
 
@@ -444,6 +444,10 @@ void CompileCall(CompileInfo* compile, Node* node) {
     }
 
     OFS += sprintf(BUF, "call %s\n", compile->table->functions[func_id].func_name);
+    if (compile->table->functions[func_id].arg_count != 0) {
+        OFS += sprintf(BUF, "add rsp, 8 * %d\n", compile->table->functions[func_id].arg_count);
+    }
+
     if (compile->table->functions[func_id].is_void != 0) {
         OFS += sprintf(BUF, "push rax ; return value of called function\n");
     }

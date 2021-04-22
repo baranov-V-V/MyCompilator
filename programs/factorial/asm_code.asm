@@ -21,6 +21,7 @@ mov [rbp - 8 * 1], rax
 mov rax, [rbp - 8 * 1] ; var [num]
 push rax  
 call factorial
+add rsp, 8 * 1
 push rax ; return value of called function
 pop rax   
 mov [rbp - 8 * 2], rax ; assembling declaration var [result]
@@ -30,7 +31,7 @@ pop rdi
 call PrintSign 
 add rsp, 8 * 2 
 pop rbp         
-ret 8 * 0  ; returning from function [main]
+ret ; returning from function [main]
              
 
 factorial:            
@@ -55,8 +56,6 @@ push 1
 jmp end_comp_0   
 end_comp_0:      
 
-;end compiling <compare> with label [0]
-
 ;begin assembling <if> with label [1]
 pop rax      
 cmp rax, 1   
@@ -68,7 +67,7 @@ push 1
 pop rax ; getting return value
 add rsp, 8 * 1 
 pop rbp         
-ret 8 * 1  ; returning from function [factorial]
+ret ; returning from function [factorial]
 jmp end_cond_1  
 
 false_1:        
@@ -78,27 +77,31 @@ mov rax, [rbp - 8 * 1] ; var [num]
 push rax  
 push 1
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [while]
 pop rax  
 sub rax, rbx
 push rax  ;end assembling math op
 call factorial
+add rsp, 8 * 1
 push rax ; return value of called function
 
-pop rbx  ;begin assembling math op
+pop rbx  ;begin assembling math op [return]
 pop rax  
-xor rdx, rdx 
-mul rbx      
+cqo           
+imul rbx      
 push rax  ;end assembling math op
 pop rax ; getting return value
 add rsp, 8 * 1 
 pop rbp         
-ret 8 * 1  ; returning from function [factorial]
+ret ; returning from function [factorial]
 end_cond_1:     
 
 ;end assembling <if> with label [1]
+																		 
+;This is standart input output funcs
+																		 
 PrintSign:													 
-				 xor r14, r14							   
+        xor r14, r14							   
 																	   
         mov rax, mask        		   
 																	   
@@ -114,12 +117,9 @@ PrintSign:
 																	   
     print_num:									     
         mov rsi, 10						     
-        call PrintNum					     
+                                    
+;begin of PrintNum 	  				     
 																     
-        ret										     
-;END PrintSign          			  	   
-																	   
-PrintNum:         								   
         mov rax, rdi;						   
 																	   
         xor rdi, rdi							   
@@ -149,17 +149,14 @@ loop_number_print:
         or rdi, rdi							   
         jne loop_number_print		   
 																	   
-        call PrintBuff						   
-        ret											   
-;END PrintDec										   
+;begin of PrintBuff								 
 																	   
-PrintBuff:												   
         or r14, r14					       
         jz end_print_buff		       
 																		 
-				 mov al, 0xA								 
-				 mov byte [Buffer + r14], al 
-				 inc r14				  		       
+        mov al, 0xA								 
+        mov byte [Buffer + r14], al 
+        inc r14				  		       
 																	   
         mov rax, 1						       
         mov rsi, Buffer             
@@ -171,67 +168,69 @@ PrintBuff:
                                     
 end_print_buff:							       
         ret									       
-;END PrintBuff								       
+                                    
+;END PrintSign								       
 
 GetNumber:													 
         xor r10, r10								 
         mov rax, 0						  		 
-	       mov rdi, 1									 
-	       mov rsi, Buffer						 
-	       mov rdx, buf_size					 
-	       syscall	           				 
-	       													   
-	       xor r14, r14 							 
-	       xor rax, rax								 
+        mov rdi, 1									 
+        mov rsi, Buffer						 
+        mov rdx, buf_size					 
+        syscall	           				 
+        													   
+        xor r14, r14 							 
+        xor rax, rax								 
         														 
-	       mov byte al, [Buffer + r14] 
-	       cmp al, '-'								 
-	       jne no_neg									 
-	       inc r14								     
-	       mov r10, 1							     
-																		 
+        mov byte al, [Buffer + r14] 
+        cmp al, '-'								 
+        jne no_neg									 
+        inc r14								     
+        mov r10, 1							     
+         													 
     no_neg:												 
-				 xor rdi, rdi								 
+        xor rdi, rdi								 
         														 
         mov byte al, [Buffer + r14] 
         inc r14										 
 																		 
     loop_number_get:								 
 																     
-	       sub al, '0'							   
-	       														 
-	       add rdi, rax								 
-	       														 
-	       mov byte al, [Buffer + r14] 
-	       inc r14										 
-              											 
-	       cmp al, 0xA								 
-	       je end_get_number					 
-	       														 
-	       mov bl, al								   
+        sub al, '0'							   
         														 
-	       mov rax, rdi								 
-	       mov rdi, 10								 
-	       														 
-	       mul rdi										 
-	       mov rdi, rax								 
+        add rdi, rax								 
+        														 
+        mov byte al, [Buffer + r14] 
+        inc r14										 
               											 
-	       xor rax, rax								 
-	       mov al, bl									 
-	       jmp loop_number_get				 
+        cmp al, 0xA								 
+        je end_get_number					 
+        														 
+        mov bl, al								   
+        														 
+        mov rax, rdi								 
+        mov rdi, 10								 
+        														 
+        mul rdi										 
+        mov rdi, rax								 
+              											 
+        xor rax, rax								 
+        mov al, bl									 
+        jmp loop_number_get				 
 																		 
     end_get_number:								 
 																		 
-	       mov rax, rdi								 
+        mov rax, rdi								 
               											 
-	       cmp r10, 1									 
-	       jne end_function						 
+        cmp r10, 1									 
+        jne end_function						 
         														 
-	       neg rax										 
+        neg rax										 
 																		 
     end_function:			 						 
  																	 
         ret												 
+;END GetNumber                      
 
 section    .data								     
 Numbers:		db "0123456789ABCDEF"  

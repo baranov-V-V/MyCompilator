@@ -53,12 +53,12 @@ enum STANDART_INDEX {
     IDX_NUM
 };
 
-const char* standart_func_msg = 
+const char* standart_func_msg =
 	"																		 \n"
-	";This is standart input\output funcs\n"
+	";This is standart input output funcs\n"
 	"																		 \n";
 
-const char* in_function = 
+const char* in_function =
 	"GetNumber:													 \n"
 	"        xor r10, r10								 \n"
 	"        mov rax, 0						  		 \n"
@@ -117,8 +117,8 @@ const char* in_function =
 	"																		 \n"
 	"    end_function:			 						 \n"
 	" 																	 \n"
-	"        ret												 \n";
-
+	"        ret												 \n"
+  ";END GetNumber                      \n";
 
 //PrintSign needs translation number in rdi
 const char* out_function =
@@ -139,12 +139,9 @@ const char* out_function =
   "																	   \n"
 	"    print_num:									     \n"
   "        mov rsi, 10						     \n"
-  "        call PrintNum					     \n"
+  "                                    \n"
+  ";begin of PrintNum 	  				     \n"
 	"																     \n"
-  "        ret										     \n"
-	";END PrintSign          			  	   \n"
-	"																	   \n"
-	"PrintNum:         								   \n"
 	"        mov rax, rdi;						   \n"
 	"																	   \n"
   "        xor rdi, rdi							   \n"
@@ -174,11 +171,8 @@ const char* out_function =
   "        or rdi, rdi							   \n"
   "        jne loop_number_print		   \n"
   "																	   \n"
-  "        call PrintBuff						   \n"
-  "        ret											   \n"
-  ";END PrintDec										   \n"
+  ";begin of PrintBuff								 \n"
   "																	   \n"
-	"PrintBuff:												   \n"
   "        or r14, r14					       \n"
   "        jz end_print_buff		       \n"
   "																		 \n"
@@ -196,7 +190,8 @@ const char* out_function =
   "                                    \n"
   "end_print_buff:							       \n"
   "        ret									       \n"
-  ";END PrintBuff								       \n";
+  "                                    \n"
+  ";END PrintSign								       \n";
 
 const char* section_data =
 	"section    .data								     \n"
