@@ -33,4 +33,7 @@ Lets assume we have a program written in
 
 # 4. Making custom Elf
 
-# 5. 
+# 5. Optimization
+
+# 6. Final result
+
