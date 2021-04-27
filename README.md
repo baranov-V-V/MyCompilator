@@ -5,8 +5,8 @@ In this progect i will make my own programming language with front-end and back-
      - [1. Front end](#1-front-end)
      - [2. Middle end](#2-middle-end)
      - [3. Back end](#3-back-end)
-       -[Into asm language](#-into-asm-language)
-       -[Into x86_64 instriction](#-into-x86_64-instructions)
+       -[Into asm language](#into-asm-language)
+       -[Into x86_64 instriction](#into-x86_64-instructions)
 2. **[My language](#my-language)
 
 # 1. How compilation works
