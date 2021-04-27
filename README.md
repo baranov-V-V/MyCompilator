@@ -15,10 +15,9 @@ In this progect i will make my own programming language with front-end and back-
 5. **[Optimization](#optimization)**
 6. **[Final result](#final-result)**
 
-# 1. How compilation works
-Lets assume we have a program written in 
-
+# 1. How compilation works 
 ## 1. Introduction
+Lets assume we have a program written in some programming language
 
 ## 2. Front end 
 
