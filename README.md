@@ -7,7 +7,12 @@ In this progect i will make my own programming language with front-end and back-
      - [3. Back end](#3-back-end)
        - [Into asm language](#into-asm-language)
        - [Into x86_64 instriction](#into-x86_64-instructions)
-2. **[My language](#my-language)
+2. **[Description of my language](#my-language)**
+     - [1. Tmp Fill](#tmp-fill)
+3. **[Instruction encoding](#instruction-encoding)**
+4. **[Making Custom Elf](#making-custom-elf)**
+5. **[Optimization](#optimization)**
+6. **[Final result](#final-result)**
 
 # 1. How compilation works
 Lets assume we have a program written in 
@@ -21,3 +26,11 @@ Lets assume we have a program written in
 ### Into asm language
 
 ### Into x86_64 instructions
+
+# 2. Description of my language
+
+# 3. Instruction encoding
+
+# 4. Making custom Elf
+
+# 5. 
