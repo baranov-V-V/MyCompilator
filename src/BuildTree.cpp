@@ -1,4 +1,5 @@
 #include "Language.h"
+#include "Compile.h"
 
 #define TOKEN tokens->data[tokens->ofs]
 #define TOKEN_NEXT tokens->data[tokens->ofs + 1]
@@ -185,23 +186,7 @@ void SetParents(Node* node) {
 
 }
 
-Tree* BuildTree(Tokens* tokens) {
-
-    char* file_name = (char*) calloc(MAX_FILENAME_LEN, sizeof(char));
-    assert(file_name != nullptr);
-
-    #ifdef DEFAULT_INPUT
-    FILE* fp = fopen(standart_input, "r");
-    #else
-    fprintf(stderr, "Please enter file name\n");
-    scanf("%s", file_name);
-
-    FILE* fp = fopen(file_name, "r");
-    if (fp == nullptr) {
-        fprintf(stderr, "Could find file with this name\n");
-        return nullptr;
-    }
-    #endif
+Tree* BuildTree(Tokens* tokens, FILE* fp, Flags* flags) {
 
     Input input = {};
     input.ofs = 0;
@@ -209,10 +194,12 @@ Tree* BuildTree(Tokens* tokens) {
     input.len = strlen(input.data);
 
     ParseIntoToxens(tokens, &input);
-    DumpTokens(tokens);
+
+    if (flags->dump_tokens) {
+        DumpTokens(tokens);
+    }
 
     Node* root = GetGram(tokens);
-    //TreeVisualDump(root, "Tree_visual_dump");
 
     Tree* tree = (Tree*) calloc(1, sizeof(Tree));
     tree->root = root;
@@ -254,19 +241,21 @@ void ParseIntoToxens(Tokens* tokens, Input* input) {
 void DumpTokens(Tokens* tokens) {
     assert(tokens != nullptr);
 
-    fprintf(stderr, "tokens ofs: %d\ntokens count: %d\n", tokens->ofs, tokens->count);
+    fprintf(stderr, "Tokens ofs: %d\nTokens count: %d\n\n", tokens->ofs, tokens->count);
 
     for (int i = 0; i < tokens->count; ++i) {
         if (tokens->data[i].type == TOKEN_NUM) {
-            fprintf(stderr, "[%d] TYPE_NUM name: <%s> data: <%lg>\n", i, tokens->data[i].name, tokens->data[i].data.num);
+            fprintf(stdout, "   [%d] TYPE_NUM name: <%s> data: <%lg>\n", i, tokens->data[i].name, tokens->data[i].data.num);
         }
         else if (tokens->data[i].type == TOKEN_OP) {
-            fprintf(stderr, "[%d] TYPE_OP name: <%s> real name: <%s> data: <%d>\n", i, tokens->data[i].name, reference_op[tokens->data[i].data.op], tokens->data[i].data.op);
+            fprintf(stdout, "  [%d] TYPE_OP name: <%s> real name: <%s> data: <%d>\n", i, tokens->data[i].name, reference_op[tokens->data[i].data.op], tokens->data[i].data.op);
         }
         else if (tokens->data[i].type == TOKEN_ID) {
-            fprintf(stderr, "[%d] TYPE_ID name: <%s> data: <%s>\n", i, tokens->data[i].name, tokens->data[i].data.id);
+            fprintf(stdout, "   [%d] TYPE_ID name: <%s> data: <%s>\n", i, tokens->data[i].name, tokens->data[i].data.id);
         }
     }
+
+    fprintf(stdout, "\nEnd tokens dump\n\n");
 
 }
 

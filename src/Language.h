@@ -17,8 +17,6 @@ const int MAX_VAR_LEN = 32;
 const int MAX_TOKENS_COUNT = 9026;
 const int MAX_TOKEN_LEN = 32;
 
-//#define DEFAULT_INPUT
-
 enum TOKENS_TYPE {
     TOKEN_NUM,
     TOKEN_ID,
@@ -206,7 +204,6 @@ typedef struct Tree {
 int FileLength(FILE* fp);
 char* ReadFile(FILE* fp);
 void ClearBuffer(Input* input);
-Tree* BuildTree(Tokens* tokens);
 void ConstructTokens(Tokens* toxens);
 void DestructToxens(Tokens* toxens);
 void ParseIntoToxens(Tokens* tokens, Input* input);

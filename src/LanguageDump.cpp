@@ -1,4 +1,5 @@
 #include "Language.h"
+#include "Compile.h"
 
 void TreeVertexPrint(Node* node, FILE* fp) {
     assert(fp != nullptr);
@@ -129,4 +130,46 @@ void TreeVisualDump(Node* root, const char* file_name) {
     fclose(fp);
 
     fprintf(stderr, "graphing done with code: %d\n", system(command_dot));
+}
+
+void DumpTable(NamesTable* table) {
+    assert(table);
+
+    printf("\nFunctions count: [%d]\n", table->func_count);
+
+    for (int i = 0; i < table->func_count; ++i) {
+        printf("Name: [%s]\n", table->functions[i].func_name);
+        if (table->functions[i].is_void == 0) {
+            printf("It is void [true]\n");
+        } else {
+            printf("It is non void [false]\n");
+        }
+        printf("Variables count: [%d]\nArguments count: [%d]\n", table->functions[i].var_count, table->functions[i].arg_count);
+
+        printf("Variables and arguments:\n");
+        for (int j = 0; j < table->functions[i].arg_count + table->functions[i].var_count; ++j) {
+            printf("    [%s]\n", table->functions[i].var_names[j]);
+        }
+        printf("\n");
+    }
+}
+
+void DumpFuncCalls(CompileInfo* compile) {
+    assert(compile);
+
+    printf("Function calls dump\n\n");
+    for (int i = 0; i < compile->call_count; ++i) {
+        printf("    [%d] called \"%s\" at pos [0x%x]\n", i, compile->calls[i].name, compile->calls[i].pos);
+    }
+    printf("End Function calls dump\n\n");
+}
+
+void DumpFuncEntries(CompileInfo* compile) {
+    assert(compile);
+
+    printf("Function entries dump\n\n");
+    for (int i = 0; i < compile->table->func_count; ++i) {
+        printf("    [%d] entry of \"%s\" at pos [0x%x]\n", i, compile->table->functions[i].func_name, compile->table->functions[i].entry);
+    }
+    printf("End Function entries dump\n\n");
 }
