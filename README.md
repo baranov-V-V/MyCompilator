@@ -105,6 +105,44 @@ Base is 3-bit field which has base register coded in 3 bits and if we use r8-r15
 First of all 
 Some commands have REX byte o
 
+## Mov
+### Mov r64, r64
+### Mov r64, imm64
+### Mov r64, m64
+##### Only base
+##### Base + index
+### Mov m64, r64
+#### Only base
+#### Base + index
+
+## Add
+### Add r64, r64
+### Add r64, imm32
+
+## Sub
+### Add r64, r64
+### Add r64, imm32
+
+## Imul
+
+## Idiv
+
+## Push
+### Push r64
+### Push imm32
+
+## Pop
+
+## Cmp
+### Cmp r64, r64
+### Cmp r64, imm32
+  
+## Jump
+
+## Call
+
+## Logic
+
 # 4. Making custom Elf
 
 # 5. Optimization
