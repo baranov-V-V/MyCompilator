@@ -1,7 +1,7 @@
 # My compilator
 In this progect i will make my own programming language with front-end and back-end compilation in nasm or directly into x86_64 instruction set. Also I will develop my own syntax to this language simular to C syntax.
 ## Table of contents
-1. **[Description of my language](#my-language)**
+1. **[Description of my language](#description-of-my-language)**
      - [1. Tmp Fill](#tmp-fill)
 2. **[How compilations works](#how-compilation-wokrs)**
      - [1. Front end](#front-end)
@@ -10,33 +10,30 @@ In this progect i will make my own programming language with front-end and back-
        - [Into asm language](#into-asm-language)
        - [Into x86_64 instriction](#into-x86_64-instructions)
 3. **[Instruction encoding](#instruction-encoding)**
-     - [1. Mov](#mov)
-       -[Mov r64, r64](#mov-r64-r64)
-       -[Mov r64, imm64](#mov-r64-imm64)
-       -[Mov r64, m64](#mov-r64-m64)
-         -[Only base](#base)
-         -[Base + index](#base-+-index)
-       -[Mov m64, r64](#mov-m64-r64)
-         -[Only base](#base)
-         -[Base + index](#base-+-index)
-     - [2. Add](#add)
-       -[Add r64, r64](#add-r64,-r64)
-       -[Add r64, imm32](#add-r64,-imm32)
-     - [3. Sub](#sub)
-       -[Add r64, r64](#add-r64,-r64)
-       -[Add r64, imm32](#add-r64,-imm32)
-     - [4. Imul](#imul)
-     - [5. Idiv](#idiv)
-     - [6. Push](#push)
-       -[Push r64](#push-r64)
-       -[Push imm32](#push-imm32)
-     - [7. Pop](#pop)
-     - [8. Cmp](#cmp)
-       -[Cmp r64, r64](#cmp-r64,-r64)
-       -[Cmp r64, imm32](#cmp-r64,-imm32)
-     - [9. Jump](#jump)
-     - [10. Call](#call)
-     - [11. Logic](#logic)
+     1. [Mov](#mov)
+       - [Mov r64, r64](#mov-r64-r64)
+       - [Mov r64, imm64](#mov-r64-imm64)
+       - [Mov r64, m64 or m64, r64](#mov-r64-m64-or-m64-r64)
+         - [Only base](#only-base)
+         - [Base and index](#base-and-index)
+     2. [Add](#add)
+       - [Add r64, r64](#add-r64-r64)
+       - [Add r64, imm32](#add-r64-imm32)
+     3. [3. Sub](#sub)
+       - [Add r64, r64](#add-r64-r64)
+       - [Add r64, imm32](#add-r64-imm32)
+     4. [4. Imul](#imul)
+     5. [5. Idiv](#idiv)
+     6. [6. Push](#push)
+       - [Push r64](#push-r64)
+       - [Push imm32](#push-imm32)
+     7. [7. Pop](#pop)
+     8. [8. Cmp](#cmp)
+       - [Cmp r64, r64](#cmp-r64-r64)
+       - [Cmp r64, imm32](#cmp-r64-imm32)
+     9. [9. Jump](#jump)
+     10. [10. Call](#call)
+     11. [11. Logic](#logic)
 4. **[Making Custom Elf](#making-custom-elf)**
 5. **[Optimization](#optimization)**
 6. **[Final result](#final-result)**
@@ -48,7 +45,7 @@ Lets assume we have a program written in some programming language. When we want
 
 It's a very complicated and interesting way.
 
-## 1. Front end
+## Front end
 Now let's see what is done in first stage of compiling a program.
 If we have macros, the automaticly opens in contents they have. After that, a special program called "Lexer" starts checking if all the data in input file is correct according to syntax of programming language. If so, the program starts parcing into an array of tokens called "lexems"
 
@@ -108,12 +105,9 @@ Some commands have REX byte o
 ## Mov
 ### Mov r64, r64
 ### Mov r64, imm64
-### Mov r64, m64
+### Mov r64, m64 or m64, r64
 ##### Only base
-##### Base + index
-### Mov m64, r64
-#### Only base
-#### Base + index
+##### Base and index
 
 ## Add
 ### Add r64, r64
