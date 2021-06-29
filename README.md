@@ -20,8 +20,8 @@ In this progect i will make my own programming language with front-end and back-
        - [Add r64, r64](#add-r64-r64)
        - [Add r64, imm32](#add-r64-imm32)
      * [3. Sub](#sub)
-       - [Add r64, r64](#add-r64-r64)
-       - [Add r64, imm32](#add-r64-imm32)
+       - [Sub r64, r64](#sub-r64-r64)
+       - [Sub r64, imm32](#sub-r64-imm32)
      * [4. Imul](#imul)
      * [5. Idiv](#idiv)
      * [6. Push](#push)
@@ -114,8 +114,8 @@ Some commands have REX byte o
 ### Add r64, imm32
 
 ## Sub
-### Add r64, r64
-### Add r64, imm32
+### Sub r64, r64
+### Sub r64, imm32
 
 ## Imul
 
